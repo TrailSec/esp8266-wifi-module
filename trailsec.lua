@@ -8,33 +8,30 @@ wifi.sta.config(SSID,SSID_PASSWORD)
 wifi.sta.autoconnect(1)
 
 HOST = "iot-https-relay-firebase.appspot.com" 
-
 URI = "/firebase/DatabaseService.json"
---URI = "/twilio/Calls.json"
 
 function build_post_request(host, uri, data_table)
 
-     data = ""
+    data = ""
+    for param,value in pairs(data_table) do
+        data = data .. param.."="..value.."&"
+    end
 
-     for param,value in pairs(data_table) do
-          data = data .. param.."="..value.."&"
-     end
-
-     request = "POST "..uri.." HTTP/1.1\r\n"..
-     "Host: "..host.."\r\n"..
-     "Connection: close\r\n"..
-     "Content-Type: application/x-www-form-urlencoded\r\n"..
-     "Content-Length: "..string.len(data).."\r\n"..
-     "\r\n"..
-     data
-     print(request)
-     return request
+    request = "POST "..uri.." HTTP/1.1\r\n"..
+        "Host: "..host.."\r\n"..
+        "Connection: close\r\n"..
+        "Content-Type: application/x-www-form-urlencoded\r\n"..
+        "Content-Length: "..string.len(data).."\r\n"..
+        "\r\n"..
+        data
+    print(request)
+    return request
 end
 
 -- This function registers a function to echo back any response from the server, to our DE1/NIOS system 
 -- or hyper-terminal (depending on what the dongle is connected to)
 function display(sck,response)
-     print(response)
+    print(response)
 end
 
 -- When using send_sms: the "from" number HAS to be your twilio number.
@@ -42,46 +39,46 @@ end
 function send_to_firebase(data_table)
 
 
- json = "{\"latitude\" : "..data_table["lat"]..", "..
-        "\"longitude\" : "..data_table["long"]..","..
-        "\"timestamp\" : "..data_table["timestamp"]..","..
-        "\"uid\" : "..data_table["uid"]..","..
-        "\"route\" : "..data_table["route"].."}"
-     data = {
+    json = "{\"latitude\" : "..data_table["lat"]..", "..
+            "\"longitude\" : "..data_table["long"]..","..
+            "\"timestamp\" : "..data_table["timestamp"]..","..
+            "\"uid\" : "..data_table["uid"]..","..
+            "\"route\" : "..data_table["route"].."}"
+    data = {
         firebaseUrl = "https://cpen391-poc.firebaseio.com/",
         path = "/Geolocation",
         method = "POST",
         data = json
-     }
+    }
      
-     print(data)
+    print(data)
 
-     socket = net.createConnection(net.TCP,0)
-     socket:on("receive",display)
-     socket:connect(80,HOST)
+    socket = net.createConnection(net.TCP,0)
+    socket:on("receive",display)
+    socket:connect(80,HOST)
 
-     socket:on("connection",function(sck)
-          post_request = build_post_request(HOST,URI,data)
-          sck:send(post_request)
-     end)
+    socket:on("connection",function(sck)
+        post_request = build_post_request(HOST,URI,data)
+        sck:send(post_request)
+    end)
 end
 
 function send_coor(latitude, longitude)
-  ip = wifi.sta.getip()
+    ip = wifi.sta.getip()
 
- if(ip==nil) then
-   print("IP address not found. Please try again")
- else
-  tmr.stop(0)
-  print("Connected to AP!")
-  print(ip)
-  json_data = {
-        lat = latitude,
-        long = longitude,
-        timestamp = "{\".sv\" : \"timestamp\"}",
-        uid = 012,
-        route = 122
-    }
-  send_to_firebase(json_data)
- end
+    if(ip==nil) then
+        print("IP address not found. Please try again")
+    else
+        tmr.stop(0)
+        print("Connected to AP!")
+        print(ip)
+        json_data = {
+            lat = latitude,
+            long = longitude,
+            timestamp = "{\".sv\" : \"timestamp\"}",
+            uid = 012,
+            route = 122
+        }
+        send_to_firebase(json_data)
+    end
 end
