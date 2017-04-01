@@ -34,7 +34,7 @@ function send_to_firebase(data_table)
     json = "{\"latitude\" : "..data_table["lat"]..", "..
             "\"longitude\" : "..data_table["long"]..","..
             "\"timestamp\" : "..data_table["timestamp"]..","..
-            "\"uid\" : "..data_table["uid"].."}"
+            "\"uid\" : \""..data_table["uid"].."\"}"
 
     data = {
         firebaseUrl = "https://cpen391-poc.firebaseio.com/",
