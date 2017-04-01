@@ -18,13 +18,12 @@ function build_post_request(host, uri, data_table)
     end
 
     request = "POST "..uri.." HTTP/1.1\r\n"..
-        "Host: "..host.."\r\n"..
-        "Connection: close\r\n"..
-        "Content-Type: application/x-www-form-urlencoded\r\n"..
-        "Content-Length: "..string.len(data).."\r\n"..
-        "\r\n"..
-        data
-    print(request)
+                "Host: "..host.."\r\n"..
+                "Connection: close\r\n"..
+                "Content-Type: application/x-www-form-urlencoded\r\n"..
+                "Content-Length: "..string.len(data).."\r\n"..
+                "\r\n"..
+                data
     return request
 end
 
@@ -38,46 +37,42 @@ end
 -- If you have a free twilio account the "to" number HAS to be your twilio verified number.
 function send_to_firebase(data_table)
 
-
     json = "{\"latitude\" : "..data_table["lat"]..", "..
             "\"longitude\" : "..data_table["long"]..","..
             "\"timestamp\" : "..data_table["timestamp"]..","..
-            "\"uid\" : "..data_table["uid"]..","..
-            "\"route\" : "..data_table["route"].."}"
+            "\"uid\" : "..data_table["uid"].."}"
+
     data = {
         firebaseUrl = "https://cpen391-poc.firebaseio.com/",
         path = "/Geolocation",
         method = "POST",
         data = json
     }
-     
-    print(data)
 
     socket = net.createConnection(net.TCP,0)
-    socket:on("receive",display)
+    socket:on("receive", function(sck, response)
+        print(response)
+    end)
     socket:connect(80,HOST)
 
-    socket:on("connection",function(sck)
+    socket:on("connection", function(sck)
         post_request = build_post_request(HOST,URI,data)
         sck:send(post_request)
     end)
 end
 
-function send_coor(latitude, longitude)
+function send_coor(latitude, longitude, user_id)
     ip = wifi.sta.getip()
 
     if(ip==nil) then
         print("IP address not found. Please try again")
     else
         tmr.stop(0)
-        print("Connected to AP!")
-        print(ip)
         json_data = {
             lat = latitude,
             long = longitude,
             timestamp = "{\".sv\" : \"timestamp\"}",
-            uid = 012,
-            route = 122
+            uid = user_id
         }
         send_to_firebase(json_data)
     end
