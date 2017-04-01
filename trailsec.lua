@@ -27,12 +27,6 @@ function build_post_request(host, uri, data_table)
     return request
 end
 
--- This function registers a function to echo back any response from the server, to our DE1/NIOS system 
--- or hyper-terminal (depending on what the dongle is connected to)
-function display(sck,response)
-    print(response)
-end
-
 -- When using send_sms: the "from" number HAS to be your twilio number.
 -- If you have a free twilio account the "to" number HAS to be your twilio verified number.
 function send_to_firebase(data_table)
@@ -50,6 +44,7 @@ function send_to_firebase(data_table)
     }
 
     socket = net.createConnection(net.TCP,0)
+    -- echo back any response from the server, to our DE1/NIOS system or hyper-terminal (depending on what the dongle is connected to)
     socket:on("receive", function(sck, response)
         print(response)
     end)
