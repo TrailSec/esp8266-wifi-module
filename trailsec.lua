@@ -16,6 +16,8 @@ function build_post_request(host, uri, data_table)
     for param,value in pairs(data_table) do
         data = data .. param.."="..value.."&"
     end
+    -- remove the trailing '&' character
+    data = string.sub(data, 0, -2)
 
     request = "POST "..uri.." HTTP/1.1\r\n"..
                 "Host: "..host.."\r\n"..
