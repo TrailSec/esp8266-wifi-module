@@ -58,7 +58,7 @@ function send_to_firebase(data_table)
     end)
 end
 
-function send_coor(latitude, longitude, user_id)
+function POST_TO_FIREBASE(latitude, longitude, user_id)
     ip = wifi.sta.getip()
 
     if(ip==nil) then
